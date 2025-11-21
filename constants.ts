@@ -1,0 +1,55 @@
+import { FoodItem } from './types';
+
+// Mocking the data from the "PDF file" mentioned in the prompt.
+// Expanded with a variety of foods to allow for valid meal generation.
+export const INITIAL_FOOD_DATABASE: FoodItem[] = [
+  { id: 4, name: "Congee (Plain Rice Porridge)", calories: 140, preference: 3 },
+  { id: 10, name: "Pasta (Cooked, 1 cup)", calories: 220, preference: 3 },
+  { id: 13, name: "Braised Pork Collar (Lean)", calories: 350, preference: 3 },
+  { id: 18, name: "Atlantic Cod (Dry-cooked)", calories: 180, preference: 3 },
+  { id: 23, name: "Minced Pork (Cooked)", calories: 320, preference: 3 },
+  { id: 29, name: "Grilled Chicken Breast (Skinless)", calories: 165, preference: 3 },
+  { id: 31, name: "Roasted Duck Meat (Skinless)", calories: 200, preference: 3 },
+  { id: 32, name: "Roasted Goose Meat (With Skin)", calories: 380, preference: 3 },
+  { id: 38, name: "Boiled Cabbage", calories: 30, preference: 3 },
+  { id: 41, name: "Boiled Corn", calories: 90, preference: 3 },
+  { id: 49, name: "Dragon Fruit", calories: 60, preference: 3 },
+  { id: 56, name: "Dry-fried Beef Ho Fun", calories: 910, preference: 3 },
+  { id: 57, name: "Soy Sauce Fried Noodles", calories: 450, preference: 3 },
+  { id: 58, name: "Yangzhou Fried Rice", calories: 965, preference: 3 },
+  { id: 68, name: "Eggplant with Minced Pork Rice", calories: 750, preference: 3 },
+  { id: 75, name: "Danish Pastry", calories: 350, preference: 3 },
+  { id: 85, name: "Raisin Bun", calories: 280, preference: 3 },
+  { id: 88, name: "BBQ Pork Pastry", calories: 320, preference: 3 },
+  { id: 93, name: "Spring Roll", calories: 150, preference: 3 },
+  { id: 94, name: "BBQ Pork Bun", calories: 300, preference: 3 },
+  { id: 100, name: "Shrimp Dumpling", calories: 50, preference: 3 },
+  { id: 109, name: "Curry Fish Balls (6pcs)", calories: 130, preference: 3 },
+  { id: 120, name: "Cream of Mushroom Soup (Puff Pastry)", calories: 450, preference: 3 },
+  { id: 123, name: "Red Bean Soup", calories: 200, preference: 3 },
+  { id: 124, name: "Sesame Paste", calories: 250, preference: 3 },
+  { id: 138, name: "Red Bean Ice Drink", calories: 350, preference: 3 },
+  { id: 140, name: "Plum Drink", calories: 120, preference: 3 },
+  { id: 148, name: "Peanut Oil (1 tbsp)", calories: 120, preference: 3 },
+  { id: 149, name: "Sesame Salad Dressing (1 tbsp)", calories: 80, preference: 3 },
+  { id: 150, name: "Ginger Paste", calories: 40, preference: 3 },
+  // Additional fillers to ensure robustness
+  { id: 151, name: "Steamed Rice (1 bowl)", calories: 200, preference: 3 },
+  { id: 152, name: "Fried Egg", calories: 90, preference: 3 },
+  { id: 153, name: "Oatmeal (Cooked)", calories: 150, preference: 3 },
+  { id: 154, name: "Apple", calories: 95, preference: 3 },
+  { id: 155, name: "Banana", calories: 105, preference: 3 },
+  { id: 156, name: "Greek Yogurt", calories: 120, preference: 3 },
+  { id: 157, name: "Salmon Sashimi (3pcs)", calories: 150, preference: 3 },
+  { id: 158, name: "Tofu Block", calories: 80, preference: 3 },
+  { id: 159, name: "Miso Soup", calories: 40, preference: 3 },
+  { id: 160, name: "Caesar Salad (No dressing)", calories: 100, preference: 3 },
+];
+
+export const ACTIVITY_LEVELS = [
+  { value: 1.2, label: 'Sedentary (Office job)' },
+  { value: 1.375, label: 'Lightly Active (1-3 days/week)' },
+  { value: 1.55, label: 'Moderately Active (3-5 days/week)' },
+  { value: 1.725, label: 'Very Active (6-7 days/week)' },
+  { value: 1.9, label: 'Super Active (Physical job)' },
+];

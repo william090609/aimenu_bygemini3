@@ -1,0 +1,5 @@
+{
+  "name": "SmartDiet AI",
+  "description": "A smart diet planner that calculates BMR and generates personalized meal plans based on food preferences and calorie requirements using Gemini AI.",
+  "requestFramePermissions": []
+}
