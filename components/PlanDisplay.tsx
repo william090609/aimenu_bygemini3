@@ -68,6 +68,56 @@ const PlanDisplay: React.FC<PlanDisplayProps> = ({ plan, onReset, language }) =>
         </div>
       </div>
 
+      {/* BMI & Exercise Card */}
+      <div className="bg-slate-800 border border-slate-700 rounded-2xl p-5 space-y-4">
+         <div className="flex justify-between items-center border-b border-slate-700 pb-3">
+            <div className="flex items-center gap-2">
+                <div className="p-2 bg-slate-700/50 rounded-lg text-blue-400">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6.5 17h11"/><path d="M6 20v-2a6 6 0 1 1 12 0v2"/><path d="M6 4v2a6 6 0 0 1 12 0V4"/><circle cx="12" cy="11" r="1"/></svg>
+                </div>
+                <div>
+                    <h3 className="font-bold text-white">{t.bmiTitle}</h3>
+                    <p className={`text-xs font-bold ${plan.bmi.color}`}>{plan.bmi.label[language]}</p>
+                </div>
+            </div>
+            <div className="text-2xl font-bold text-white">
+                {plan.bmi.value}
+            </div>
+        </div>
+
+        <div>
+            <div className="text-sm font-semibold text-slate-300 mb-3">{t.exerciseTitle} <span className="text-xs font-normal text-slate-500 block">{t.exerciseSubtitle}</span></div>
+            <div className="space-y-3">
+                {plan.exercises.map((ex, idx) => (
+                    <div key={idx} className="bg-slate-700/30 rounded-lg p-3 flex flex-col gap-2">
+                         <div className="flex justify-between items-start">
+                             <div className="font-medium text-slate-200">{ex.name[language]}</div>
+                             <a 
+                                href={`https://www.youtube.com/results?search_query=${encodeURIComponent(ex.youtubeQuery)}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-center gap-1 text-xs text-red-400 hover:text-red-300 font-medium px-2 py-1 bg-red-400/10 rounded-full transition-colors"
+                             >
+                                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17"/><path d="m10 15 5-3-5-3z"/></svg>
+                                 {t.watchVideo}
+                             </a>
+                         </div>
+                         <div className="flex gap-4 text-xs text-slate-400">
+                             <div className="flex items-center gap-1">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                                {t.duration}: {ex.duration[language]}
+                             </div>
+                             <div className="flex items-center gap-1">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                                {t.intensity}: {ex.intensity[language]}
+                             </div>
+                         </div>
+                    </div>
+                ))}
+            </div>
+        </div>
+      </div>
+
       <div className="space-y-4">
         <MealCard 
             title={t.breakfast} 

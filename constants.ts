@@ -1,4 +1,4 @@
-import { FoodItem, Language } from './types';
+import { FoodItem, Language, BMICategory, Exercise } from './types';
 
 export const TRANSLATIONS = {
   en: {
@@ -39,6 +39,17 @@ export const TRANSLATIONS = {
     headerPlan: "Smart Plan",
     saveSuccess: "Saved",
     saveError: "Failed to save",
+
+    bmiTitle: "Your BMI Score",
+    bmiUnderweight: "Underweight",
+    bmiNormal: "Normal Weight",
+    bmiOverweight: "Overweight",
+    bmiObese: "Obese",
+    exerciseTitle: "Recommended Exercises",
+    exerciseSubtitle: "Based on your BMI and profile",
+    watchVideo: "Watch Video",
+    duration: "Duration",
+    intensity: "Intensity",
   },
   zh: {
     profileTitle: "讓我們了解您",
@@ -78,6 +89,17 @@ export const TRANSLATIONS = {
     headerPlan: "智能計劃",
     saveSuccess: "已儲存",
     saveError: "儲存失敗",
+
+    bmiTitle: "您的 BMI 指數",
+    bmiUnderweight: "體重過輕",
+    bmiNormal: "體重正常",
+    bmiOverweight: "體重過重",
+    bmiObese: "肥胖",
+    exerciseTitle: "推薦運動",
+    exerciseSubtitle: "根據您的 BMI 和個人資料",
+    watchVideo: "觀看影片",
+    duration: "時長",
+    intensity: "強度",
   }
 };
 
@@ -88,6 +110,71 @@ export const ACTIVITY_LEVELS = [
   { value: 1.725, label: { en: 'Very Active (6-7 days/week)', zh: '高度活動 (每週 6-7 天)' } },
   { value: 1.9, label: { en: 'Super Active (Physical job)', zh: '極度活動 (體力勞動)' } },
 ];
+
+export const EXERCISE_DATABASE: Record<BMICategory, Exercise[]> = {
+  'Underweight': [
+    {
+      name: { en: "Bodyweight Strength Training", zh: "自重力量訓練" },
+      duration: { en: "30 mins", zh: "30 分鐘" },
+      intensity: { en: "Low to Moderate", zh: "低至中等" },
+      youtubeQuery: "bodyweight strength training for beginners"
+    },
+    {
+      name: { en: "Yoga for Strength", zh: "力量瑜伽" },
+      duration: { en: "20 mins", zh: "20 分鐘" },
+      intensity: { en: "Low", zh: "低" },
+      youtubeQuery: "yoga for strength building beginners"
+    }
+  ],
+  'Normal': [
+    {
+      name: { en: "HIIT Cardio Workout", zh: "HIIT 有氧訓練" },
+      duration: { en: "20 mins", zh: "20 分鐘" },
+      intensity: { en: "High", zh: "高" },
+      youtubeQuery: "20 min hiit workout"
+    },
+    {
+      name: { en: "Full Body Toning", zh: "全身塑形" },
+      duration: { en: "45 mins", zh: "45 分鐘" },
+      intensity: { en: "Moderate", zh: "中等" },
+      youtubeQuery: "full body toning workout"
+    }
+  ],
+  'Overweight': [
+    {
+      name: { en: "Low Impact Cardio", zh: "低衝擊有氧運動" },
+      duration: { en: "30 mins", zh: "30 分鐘" },
+      intensity: { en: "Moderate", zh: "中等" },
+      youtubeQuery: "30 min low impact cardio for beginners"
+    },
+    {
+      name: { en: "Walking Workout", zh: "健走訓練" },
+      duration: { en: "20 mins", zh: "20 分鐘" },
+      intensity: { en: "Low", zh: "低" },
+      youtubeQuery: "20 minute walking workout at home"
+    }
+  ],
+  'Obese': [
+    {
+      name: { en: "Seated Chair Exercises", zh: "坐姿椅子運動" },
+      duration: { en: "15 mins", zh: "15 分鐘" },
+      intensity: { en: "Low", zh: "低" },
+      youtubeQuery: "seated chair workout for seniors and beginners"
+    },
+    {
+      name: { en: "Water Aerobics (if available)", zh: "水中健美操 (如適用)" },
+      duration: { en: "30 mins", zh: "30 分鐘" },
+      intensity: { en: "Low Impact", zh: "低衝擊" },
+      youtubeQuery: "water aerobics for beginners"
+    },
+     {
+      name: { en: "Ultra Low Impact Walking", zh: "超低衝擊健走" },
+      duration: { en: "15 mins", zh: "15 分鐘" },
+      intensity: { en: "Low", zh: "低" },
+      youtubeQuery: "15 min ultra low impact walking workout"
+    }
+  ]
+};
 
 // Complete Food Database from the provided PDF
 export const INITIAL_FOOD_DATABASE: FoodItem[] = [

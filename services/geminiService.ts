@@ -1,5 +1,6 @@
 import { GoogleGenAI, Type, Schema } from "@google/genai";
-import { FoodItem, UserProfile, DailyPlan, Gender } from '../types';
+import { FoodItem, UserProfile, DailyPlan, Gender, BMIResult, BMICategory, Exercise } from '../types';
+import { EXERCISE_DATABASE } from '../constants';
 
 // BMR Calculation Logic
 export const calculateBMR = (profile: UserProfile): number => {
@@ -12,6 +13,40 @@ export const calculateBMR = (profile: UserProfile): number => {
     bmr = (655 + (9.56 * profile.weight) + (1.85 * profile.height) - (4.68 * profile.age));
   }
   return Math.round(bmr * profile.activityLevel);
+};
+
+export const calculateBMI = (weight: number, height: number): BMIResult => {
+  const heightInMeters = height / 100;
+  const bmiValue = weight / (heightInMeters * heightInMeters);
+  const roundedBMI = Math.round(bmiValue * 10) / 10;
+  
+  let category: BMICategory;
+  let label: { en: string; zh: string };
+  let color: string;
+
+  if (bmiValue < 18.5) {
+    category = 'Underweight';
+    label = { en: 'Underweight', zh: '體重過輕' };
+    color = 'text-blue-400';
+  } else if (bmiValue < 25) {
+    category = 'Normal';
+    label = { en: 'Normal Weight', zh: '體重正常' };
+    color = 'text-emerald-400';
+  } else if (bmiValue < 30) {
+    category = 'Overweight';
+    label = { en: 'Overweight', zh: '體重過重' };
+    color = 'text-orange-400';
+  } else {
+    category = 'Obese';
+    label = { en: 'Obese', zh: '肥胖' };
+    color = 'text-red-400';
+  }
+
+  return { value: roundedBMI, category, label, color };
+};
+
+export const getExerciseRecommendations = (bmiCategory: BMICategory): Exercise[] => {
+  return EXERCISE_DATABASE[bmiCategory] || EXERCISE_DATABASE['Normal'];
 };
 
 const servingSchema: Schema = {
@@ -53,6 +88,8 @@ export const generateMealPlan = async (
   foods: FoodItem[]
 ): Promise<DailyPlan> => {
   const bmr = calculateBMR(profile);
+  const bmiResult = calculateBMI(profile.weight, profile.height);
+  const exercises = getExerciseRecommendations(bmiResult.category);
   
   const breakfastTarget = Math.round(bmr * 0.25);
   const lunchTarget = Math.round(bmr * 0.35);
@@ -98,7 +135,9 @@ export const generateMealPlan = async (
     const result = JSON.parse(response.text);
     return {
       ...result,
-      bmr
+      bmr,
+      bmi: bmiResult,
+      exercises
     };
 
   } catch (error) {
