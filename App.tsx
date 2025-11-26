@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import Layout from './components/Layout';
 import ProfileForm from './components/ProfileForm';
 import PreferenceSelector from './components/PreferenceSelector';
@@ -22,6 +22,27 @@ const App: React.FC = () => {
   const [plan, setPlan] = useState<DailyPlan | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
+  // Load saved data on mount
+  useEffect(() => {
+    try {
+      const savedProfile = localStorage.getItem('smartDiet_profile');
+      if (savedProfile) {
+        setProfile(JSON.parse(savedProfile));
+      }
+
+      const savedPrefs = localStorage.getItem('smartDiet_preferences');
+      if (savedPrefs) {
+        const prefsMap = JSON.parse(savedPrefs) as Record<number, number>;
+        setFoods(prev => prev.map(item => ({
+          ...item,
+          preference: prefsMap[item.id] !== undefined ? prefsMap[item.id] : item.preference
+        })));
+      }
+    } catch (error) {
+      console.error("Failed to load saved data:", error);
+    }
+  }, []);
+
   const handleProfileChange = useCallback((field: keyof UserProfile, value: string | number) => {
     setProfile(prev => ({ ...prev, [field]: value }));
   }, []);
@@ -32,7 +53,30 @@ const App: React.FC = () => {
     ));
   }, []);
 
+  const handleSave = useCallback(() => {
+    try {
+      // Save Profile
+      localStorage.setItem('smartDiet_profile', JSON.stringify(profile));
+      
+      // Save Preferences (Optimization: only save non-default values)
+      const prefsMap = foods.reduce((acc, item) => {
+        if (item.preference !== 3) {
+          acc[item.id] = item.preference;
+        }
+        return acc;
+      }, {} as Record<number, number>);
+      
+      localStorage.setItem('smartDiet_preferences', JSON.stringify(prefsMap));
+    } catch (error) {
+      console.error("Failed to save data:", error);
+      alert("Failed to save data. Storage might be full.");
+    }
+  }, [profile, foods]);
+
   const handleGenerate = async () => {
+    // Auto-save before generating
+    handleSave();
+    
     setIsLoading(true);
     try {
       const generatedPlan = await generateMealPlan(profile, foods);
@@ -92,6 +136,7 @@ const App: React.FC = () => {
         title={getTitle()} 
         showBack={step === 'preferences'} 
         onBack={() => setStep('profile')}
+        onSave={(step === 'profile' || step === 'preferences') ? handleSave : undefined}
     >
       {renderStep()}
     </Layout>
