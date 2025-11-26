@@ -1,4 +1,93 @@
-import { FoodItem } from './types';
+import { FoodItem, Language } from './types';
+
+export const TRANSLATIONS = {
+  en: {
+    profileTitle: "Let's get to know you",
+    profileSubtitle: "We need this data to calculate your BMR accurately.",
+    weight: "Weight",
+    height: "Height",
+    age: "Age",
+    gender: "Gender",
+    male: "Male",
+    female: "Female",
+    activityLevel: "Activity Level",
+    nextBtn: "Next: Food Preferences",
+    
+    prefTitle: "Rate Your Foods",
+    prefSubtitle: "0 = Dislike, 6 = Strongly Like. Default is 3.",
+    searchPlaceholder: "Search foods...",
+    noFoodsFound: "No foods found matching",
+    generateBtn: "Generate Meal Plan",
+    generating: "Generative AI Thinking...",
+    dislike: "Dislike",
+    neutral: "Neutral",
+    love: "Love",
+    
+    planTitle: "Your Daily Plan",
+    planSubtitle: "Optimized for preferences & metabolism",
+    totalCalories: "Total Calories",
+    prefScore: "Preference Score",
+    target: "Target",
+    higherBetter: "Higher is better",
+    breakfast: "Breakfast",
+    lunch: "Lunch",
+    dinner: "Dinner",
+    startOver: "Start Over",
+    
+    headerProfile: "Profile",
+    headerPref: "Food Preferences",
+    headerPlan: "Smart Plan",
+    saveSuccess: "Saved",
+    saveError: "Failed to save",
+  },
+  zh: {
+    profileTitle: "讓我們了解您",
+    profileSubtitle: "我們需要這些數據來準確計算您的 BMR。",
+    weight: "體重",
+    height: "身高",
+    age: "年齡",
+    gender: "性別",
+    male: "男性",
+    female: "女性",
+    activityLevel: "活動量",
+    nextBtn: "下一步：食物偏好",
+    
+    prefTitle: "食物評分",
+    prefSubtitle: "0 = 不喜歡，6 = 非常喜歡。預設為 3。",
+    searchPlaceholder: "搜尋食物...",
+    noFoodsFound: "找不到符合的食物",
+    generateBtn: "生成飲食計劃",
+    generating: "AI 正在思考中...",
+    dislike: "不喜歡",
+    neutral: "普通",
+    love: "喜愛",
+    
+    planTitle: "您的每日計劃",
+    planSubtitle: "根據您的偏好和代謝優化",
+    totalCalories: "總卡路里",
+    prefScore: "偏好分數",
+    target: "目標",
+    higherBetter: "越高越好",
+    breakfast: "早餐",
+    lunch: "午餐",
+    dinner: "晚餐",
+    startOver: "重新開始",
+    
+    headerProfile: "個人資料",
+    headerPref: "食物偏好",
+    headerPlan: "智能計劃",
+    saveSuccess: "已儲存",
+    saveError: "儲存失敗",
+  }
+};
+
+export const ACTIVITY_LEVELS = [
+  { value: 1.2, label: { en: 'Sedentary (Office job)', zh: '久坐 (辦公室工作)' } },
+  { value: 1.375, label: { en: 'Lightly Active (1-3 days/week)', zh: '輕度活動 (每週 1-3 天)' } },
+  { value: 1.55, label: { en: 'Moderately Active (3-5 days/week)', zh: '中度活動 (每週 3-5 天)' } },
+  { value: 1.725, label: { en: 'Very Active (6-7 days/week)', zh: '高度活動 (每週 6-7 天)' } },
+  { value: 1.9, label: { en: 'Super Active (Physical job)', zh: '極度活動 (體力勞動)' } },
+];
 
 // Complete Food Database from the provided PDF
 export const INITIAL_FOOD_DATABASE: FoodItem[] = [
@@ -502,12 +591,4 @@ export const INITIAL_FOOD_DATABASE: FoodItem[] = [
   { id: 498, name: "Beef pot pie", calories: 600, preference: 3 },
   { id: 499, name: "Lemon chicken wings", calories: 250, preference: 3 },
   { id: 500, name: "Scrambled egg on buttered toast (炒蛋牛油多士)", calories: 400, preference: 3 }
-];
-
-export const ACTIVITY_LEVELS = [
-  { value: 1.2, label: 'Sedentary (Office job)' },
-  { value: 1.375, label: 'Lightly Active (1-3 days/week)' },
-  { value: 1.55, label: 'Moderately Active (3-5 days/week)' },
-  { value: 1.725, label: 'Very Active (6-7 days/week)' },
-  { value: 1.9, label: 'Super Active (Physical job)' },
 ];

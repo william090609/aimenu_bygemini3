@@ -58,16 +58,9 @@ export const generateMealPlan = async (
   const lunchTarget = Math.round(bmr * 0.35);
   const dinnerTarget = Math.round(bmr * 0.40);
 
-  // Filter foods: Remove strictly hated foods (0 score) unless absolutely necessary, 
-  // but strictly strictly speaking, 0 means "dislike", maybe we can keep them but weight them very low.
-  // The prompt will handle the logic.
-  
-  const simplifiedFoodList = foods.map(f => ({
-    id: f.id,
-    n: f.name,
-    c: f.calories,
-    p: f.preference
-  }));
+  // Optimization: Use CSV format to drastically reduce payload size and token usage.
+  // This helps prevent "Rpc failed due to xhr error" (code 500) caused by massive JSON bodies.
+  const csvList = foods.map(f => `${f.id}|${f.name.replace(/\|/g, '')}|${f.calories}|${f.preference}`).join('\n');
 
   const prompt = `
     You are a Smart Diet Planner.
@@ -78,13 +71,13 @@ export const generateMealPlan = async (
     - Dinner Target (~40%): ${dinnerTarget} kcal.
     
     Constraints:
-    1. Select foods from the provided JSON list ONLY.
+    1. Select foods from the provided CSV list ONLY.
     2. In a single meal, the same food item MUST NOT exceed 2 servings.
     3. Maximize the Total Preference Score. Prefer foods with preference > 3. Avoid preference 0 or 1 if possible.
     4. Stay close to the calorie targets for each meal (+/- 10% tolerance is acceptable, but try to be precise).
     
-    Food Database (JSON):
-    ${JSON.stringify(simplifiedFoodList)}
+    Food Database (CSV Format: id|name|calories|preference):
+    ${csvList}
     
     Return the result in JSON format matching the schema.
   `;
@@ -98,7 +91,7 @@ export const generateMealPlan = async (
       config: {
         responseMimeType: "application/json",
         responseSchema: planResponseSchema,
-        temperature: 0.3, // Lower temperature for more math-adhering results
+        temperature: 0.3,
       }
     });
 
@@ -110,6 +103,6 @@ export const generateMealPlan = async (
 
   } catch (error) {
     console.error("Error generating plan:", error);
-    throw new Error("Failed to generate diet plan. Please check your API Key or try again.");
+    throw error; 
   }
 };

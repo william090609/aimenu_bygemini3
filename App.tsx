@@ -3,12 +3,13 @@ import Layout from './components/Layout';
 import ProfileForm from './components/ProfileForm';
 import PreferenceSelector from './components/PreferenceSelector';
 import PlanDisplay from './components/PlanDisplay';
-import { UserProfile, Gender, Step, FoodItem, DailyPlan } from './types';
-import { INITIAL_FOOD_DATABASE } from './constants';
+import { UserProfile, Gender, Step, FoodItem, DailyPlan, Language } from './types';
+import { INITIAL_FOOD_DATABASE, TRANSLATIONS } from './constants';
 import { generateMealPlan } from './services/geminiService';
 
 const App: React.FC = () => {
   const [step, setStep] = useState<Step>('profile');
+  const [language, setLanguage] = useState<Language>('en');
   const [profile, setProfile] = useState<UserProfile>({
     weight: 0,
     height: 0,
@@ -38,10 +39,21 @@ const App: React.FC = () => {
           preference: prefsMap[item.id] !== undefined ? prefsMap[item.id] : item.preference
         })));
       }
+      
+      const savedLang = localStorage.getItem('smartDiet_language');
+      if (savedLang === 'zh' || savedLang === 'en') {
+        setLanguage(savedLang);
+      }
     } catch (error) {
       console.error("Failed to load saved data:", error);
     }
   }, []);
+
+  const handleLanguageToggle = useCallback(() => {
+    const newLang = language === 'en' ? 'zh' : 'en';
+    setLanguage(newLang);
+    localStorage.setItem('smartDiet_language', newLang);
+  }, [language]);
 
   const handleProfileChange = useCallback((field: keyof UserProfile, value: string | number) => {
     setProfile(prev => ({ ...prev, [field]: value }));
@@ -83,7 +95,8 @@ const App: React.FC = () => {
       setPlan(generatedPlan);
       setStep('plan');
     } catch (error) {
-      alert("Failed to generate plan. Please try again.");
+      console.error(error);
+      alert("Failed to generate plan. Please try again. If the error persists, try reducing the complexity or checking your connection.");
     } finally {
       setIsLoading(false);
     }
@@ -92,7 +105,6 @@ const App: React.FC = () => {
   const handleReset = () => {
     setStep('profile');
     setPlan(null);
-    // Optional: Reset preferences? No, let's keep them for better UX.
   };
 
   const renderStep = () => {
@@ -103,6 +115,7 @@ const App: React.FC = () => {
             profile={profile} 
             onChange={handleProfileChange} 
             onNext={() => setStep('preferences')} 
+            language={language}
           />
         );
       case 'preferences':
@@ -112,11 +125,12 @@ const App: React.FC = () => {
             onUpdatePreference={handlePreferenceUpdate} 
             onGenerate={handleGenerate}
             isLoading={isLoading}
+            language={language}
           />
         );
       case 'plan':
         return plan ? (
-          <PlanDisplay plan={plan} onReset={handleReset} />
+          <PlanDisplay plan={plan} onReset={handleReset} language={language} />
         ) : null;
       default:
         return null;
@@ -124,10 +138,11 @@ const App: React.FC = () => {
   };
 
   const getTitle = () => {
+    const t = TRANSLATIONS[language];
     switch (step) {
-        case 'profile': return 'Profile';
-        case 'preferences': return 'Food Preferences';
-        case 'plan': return 'Smart Plan';
+        case 'profile': return t.headerProfile;
+        case 'preferences': return t.headerPref;
+        case 'plan': return t.headerPlan;
     }
   }
 
@@ -137,6 +152,8 @@ const App: React.FC = () => {
         showBack={step === 'preferences'} 
         onBack={() => setStep('profile')}
         onSave={(step === 'profile' || step === 'preferences') ? handleSave : undefined}
+        language={language}
+        onToggleLanguage={handleLanguageToggle}
     >
       {renderStep()}
     </Layout>

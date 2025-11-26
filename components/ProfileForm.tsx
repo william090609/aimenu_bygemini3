@@ -1,27 +1,28 @@
 import React from 'react';
-import { UserProfile, Gender } from '../types';
-import { ACTIVITY_LEVELS } from '../constants';
+import { UserProfile, Gender, Language } from '../types';
+import { ACTIVITY_LEVELS, TRANSLATIONS } from '../constants';
 
 interface ProfileFormProps {
   profile: UserProfile;
   onChange: (field: keyof UserProfile, value: string | number) => void;
   onNext: () => void;
+  language: Language;
 }
 
-const ProfileForm: React.FC<ProfileFormProps> = ({ profile, onChange, onNext }) => {
-  
+const ProfileForm: React.FC<ProfileFormProps> = ({ profile, onChange, onNext, language }) => {
+  const t = TRANSLATIONS[language];
   const isValid = profile.weight > 0 && profile.height > 0 && profile.age > 0;
 
   return (
     <div className="space-y-6 animate-fade-in">
       <div className="text-center mb-8">
-        <h2 className="text-2xl font-bold text-white mb-2">Let's get to know you</h2>
-        <p className="text-slate-400 text-sm">We need this data to calculate your BMR accurately.</p>
+        <h2 className="text-2xl font-bold text-white mb-2">{t.profileTitle}</h2>
+        <p className="text-slate-400 text-sm">{t.profileSubtitle}</p>
       </div>
 
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
-          <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Weight (kg)</label>
+          <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">{t.weight} (kg)</label>
           <div className="relative">
             <input
               type="number"
@@ -35,7 +36,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ profile, onChange, onNext }) 
         </div>
 
         <div className="space-y-2">
-          <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Height (cm)</label>
+          <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">{t.height} (cm)</label>
           <div className="relative">
             <input
               type="number"
@@ -51,7 +52,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ profile, onChange, onNext }) 
 
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
-          <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Age</label>
+          <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">{t.age}</label>
           <input
             type="number"
             value={profile.age || ''}
@@ -62,20 +63,20 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ profile, onChange, onNext }) 
         </div>
 
         <div className="space-y-2">
-          <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Gender</label>
+          <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">{t.gender}</label>
           <select
             value={profile.gender}
             onChange={(e) => onChange('gender', e.target.value)}
             className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all appearance-none"
           >
-            <option value={Gender.MALE}>Male</option>
-            <option value={Gender.FEMALE}>Female</option>
+            <option value={Gender.MALE}>{t.male}</option>
+            <option value={Gender.FEMALE}>{t.female}</option>
           </select>
         </div>
       </div>
 
       <div className="space-y-2">
-        <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Activity Level</label>
+        <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">{t.activityLevel}</label>
         <div className="space-y-3">
           {ACTIVITY_LEVELS.map((level) => (
             <button
@@ -87,7 +88,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ profile, onChange, onNext }) 
                   : 'bg-slate-800 border-slate-700 text-slate-300 hover:border-slate-600'
               }`}
             >
-              <span className="text-sm font-medium">{level.label}</span>
+              <span className="text-sm font-medium">{level.label[language]}</span>
               {profile.activityLevel === level.value && (
                 <div className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_10px_rgba(52,211,153,0.5)]"></div>
               )}
@@ -106,7 +107,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ profile, onChange, onNext }) 
             : 'bg-slate-800 text-slate-500 cursor-not-allowed'
           }`}
         >
-          Next: Food Preferences
+          {t.nextBtn}
         </button>
       </div>
     </div>

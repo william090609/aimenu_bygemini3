@@ -1,15 +1,18 @@
 import React, { useState, useMemo } from 'react';
-import { FoodItem } from '../types';
+import { FoodItem, Language } from '../types';
+import { TRANSLATIONS } from '../constants';
 
 interface PreferenceSelectorProps {
   foods: FoodItem[];
   onUpdatePreference: (id: number, rating: number) => void;
   onGenerate: () => void;
   isLoading: boolean;
+  language: Language;
 }
 
-const PreferenceSelector: React.FC<PreferenceSelectorProps> = ({ foods, onUpdatePreference, onGenerate, isLoading }) => {
+const PreferenceSelector: React.FC<PreferenceSelectorProps> = ({ foods, onUpdatePreference, onGenerate, isLoading, language }) => {
   const [filter, setFilter] = useState('');
+  const t = TRANSLATIONS[language];
 
   const filteredFoods = useMemo(() => {
     return foods.filter(f => f.name.toLowerCase().includes(filter.toLowerCase()));
@@ -27,13 +30,13 @@ const PreferenceSelector: React.FC<PreferenceSelectorProps> = ({ foods, onUpdate
     <div className="flex flex-col h-full animate-fade-in">
       <div className="sticky top-0 bg-slate-900 z-10 pb-4 space-y-4">
         <div className="text-center">
-            <h2 className="text-2xl font-bold text-white">Rate Your Foods</h2>
-            <p className="text-slate-400 text-sm">0 = Dislike, 6 = Strongly Like. Default is 3.</p>
+            <h2 className="text-2xl font-bold text-white">{t.prefTitle}</h2>
+            <p className="text-slate-400 text-sm">{t.prefSubtitle}</p>
         </div>
         <div className="relative">
              <input 
                 type="text" 
-                placeholder="Search foods..." 
+                placeholder={t.searchPlaceholder} 
                 className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 pl-10 pr-10 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all placeholder-slate-500"
                 value={filter}
                 onChange={(e) => setFilter(e.target.value)}
@@ -76,16 +79,16 @@ const PreferenceSelector: React.FC<PreferenceSelectorProps> = ({ foods, onUpdate
               className="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-emerald-500"
             />
             <div className="flex justify-between text-xs text-slate-500 px-1">
-              <span>Dislike</span>
-              <span>Neutral</span>
-              <span>Love</span>
+              <span>{t.dislike}</span>
+              <span>{t.neutral}</span>
+              <span>{t.love}</span>
             </div>
           </div>
         ))}
         {filteredFoods.length === 0 && (
             <div className="text-center py-10 text-slate-500 flex flex-col items-center gap-2">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="opacity-50"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-                <span>No foods found matching "{filter}".</span>
+                <span>{t.noFoodsFound} "{filter}".</span>
             </div>
         )}
       </div>
@@ -102,10 +105,10 @@ const PreferenceSelector: React.FC<PreferenceSelectorProps> = ({ foods, onUpdate
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
-                Generative AI Thinking...
+                {t.generating}
              </>
           ) : (
-            "Generate Meal Plan"
+            t.generateBtn
           )}
         </button>
       </div>

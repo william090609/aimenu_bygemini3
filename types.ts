@@ -3,6 +3,8 @@ export enum Gender {
   FEMALE = 'Female'
 }
 
+export type Language = 'en' | 'zh';
+
 export interface UserProfile {
   weight: number; // kg
   height: number; // cm

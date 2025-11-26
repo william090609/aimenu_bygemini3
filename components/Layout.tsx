@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { TRANSLATIONS } from '../constants';
+import { Language } from '../types';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -6,10 +8,13 @@ interface LayoutProps {
   showBack?: boolean;
   onBack?: () => void;
   onSave?: () => void;
+  language: Language;
+  onToggleLanguage: () => void;
 }
 
-const Layout: React.FC<LayoutProps> = ({ children, title, showBack, onBack, onSave }) => {
+const Layout: React.FC<LayoutProps> = ({ children, title, showBack, onBack, onSave, language, onToggleLanguage }) => {
   const [showSavedFeedback, setShowSavedFeedback] = useState(false);
+  const t = TRANSLATIONS[language];
 
   const handleSaveClick = () => {
     if (onSave) {
@@ -34,18 +39,25 @@ const Layout: React.FC<LayoutProps> = ({ children, title, showBack, onBack, onSa
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
               </button>
             )}
-            <h1 className="text-lg font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
+            <h1 className="text-lg font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent truncate max-w-[150px]">
               {title}
             </h1>
           </div>
           
           <div className="flex items-center gap-2">
+             <button
+              onClick={onToggleLanguage}
+              className="px-2 py-1 text-xs font-semibold rounded bg-slate-800 text-slate-300 border border-slate-700 hover:border-emerald-500 transition-colors"
+            >
+              {language === 'en' ? '中文' : 'EN'}
+            </button>
+            
             {onSave && (
               <button 
                 onClick={handleSaveClick}
                 disabled={showSavedFeedback}
                 className="p-2 rounded-full hover:bg-slate-800 text-slate-400 hover:text-emerald-400 transition-colors disabled:opacity-100 disabled:text-emerald-500"
-                title="Save Progress"
+                title={t.saveSuccess}
                 aria-label="Save"
               >
                 {showSavedFeedback ? (
