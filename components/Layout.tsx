@@ -68,7 +68,7 @@ const Layout: React.FC<LayoutProps> = ({ children, title, showBack, onBack, onSa
               </button>
             )}
             <div className="w-8 h-8 bg-slate-800 rounded-full flex items-center justify-center text-xs font-bold text-emerald-500 border border-slate-700 select-none">
-              AI
+              SD
             </div>
           </div>
         </header>

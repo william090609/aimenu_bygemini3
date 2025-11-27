@@ -34,22 +34,6 @@ export interface Meal {
   targetCalories: number;
 }
 
-export type BMICategory = 'Underweight' | 'Normal' | 'Overweight' | 'Obese';
-
-export interface BMIResult {
-  value: number;
-  category: BMICategory;
-  label: { en: string; zh: string };
-  color: string;
-}
-
-export interface Exercise {
-  name: { en: string; zh: string };
-  duration: { en: string; zh: string };
-  intensity: { en: string; zh: string };
-  youtubeQuery: string;
-}
-
 export interface DailyPlan {
   breakfast: Meal;
   lunch: Meal;
@@ -57,8 +41,6 @@ export interface DailyPlan {
   totalCalories: number;
   totalPreferenceScore: number;
   bmr: number;
-  bmi: BMIResult;
-  exercises: Exercise[];
 }
 
 export type Step = 'profile' | 'preferences' | 'plan';

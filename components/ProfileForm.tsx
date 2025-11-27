@@ -31,7 +31,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ profile, onChange, onNext, la
               className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all placeholder-slate-600"
               placeholder="70"
             />
-            <span className="absolute right-4 top-3.5 text-slate-500 text-sm pointer-events-none">kg</span>
+            <span className="absolute right-4 top-3.5 text-slate-500 text-sm">kg</span>
           </div>
         </div>
 
@@ -45,7 +45,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ profile, onChange, onNext, la
               className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all placeholder-slate-600"
               placeholder="175"
             />
-             <span className="absolute right-4 top-3.5 text-slate-500 text-sm pointer-events-none">cm</span>
+             <span className="absolute right-4 top-3.5 text-slate-500 text-sm">cm</span>
           </div>
         </div>
       </div>

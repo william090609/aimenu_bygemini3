@@ -1,6 +1,4 @@
-import { GoogleGenAI, Type, Schema } from "@google/genai";
-import { FoodItem, UserProfile, DailyPlan, Gender, BMIResult, BMICategory, Exercise } from '../types';
-import { EXERCISE_DATABASE } from '../constants';
+import { FoodItem, UserProfile, DailyPlan, Gender, Meal, Serving } from '../types';
 
 // BMR Calculation Logic
 export const calculateBMR = (profile: UserProfile): number => {
@@ -15,133 +13,122 @@ export const calculateBMR = (profile: UserProfile): number => {
   return Math.round(bmr * profile.activityLevel);
 };
 
-export const calculateBMI = (weight: number, height: number): BMIResult => {
-  const heightInMeters = height / 100;
-  const bmiValue = weight / (heightInMeters * heightInMeters);
-  const roundedBMI = Math.round(bmiValue * 10) / 10;
+// Helper to select a food item based on preference weight
+const getRandomFood = (candidates: FoodItem[]): FoodItem => {
+  // Use exponential weighting to strongly favor higher preferences
+  // Pref 0 -> 1
+  // Pref 3 -> 8
+  // Pref 6 -> 64
+  const totalWeight = candidates.reduce((sum, item) => sum + Math.pow(2, item.preference), 0);
+  let random = Math.random() * totalWeight;
   
-  let category: BMICategory;
-  let label: { en: string; zh: string };
-  let color: string;
+  for (const item of candidates) {
+    const weight = Math.pow(2, item.preference);
+    random -= weight;
+    if (random <= 0) return item;
+  }
+  return candidates[candidates.length - 1];
+};
 
-  if (bmiValue < 18.5) {
-    category = 'Underweight';
-    label = { en: 'Underweight', zh: '體重過輕' };
-    color = 'text-blue-400';
-  } else if (bmiValue < 25) {
-    category = 'Normal';
-    label = { en: 'Normal Weight', zh: '體重正常' };
-    color = 'text-emerald-400';
-  } else if (bmiValue < 30) {
-    category = 'Overweight';
-    label = { en: 'Overweight', zh: '體重過重' };
-    color = 'text-orange-400';
-  } else {
-    category = 'Obese';
-    label = { en: 'Obese', zh: '肥胖' };
-    color = 'text-red-400';
+const createMeal = (targetCalories: number, availableFoods: FoodItem[]): Meal => {
+  let currentCalories = 0;
+  const items: Serving[] = [];
+  const itemsMap = new Map<number, Serving>(); // Track counts
+
+  let attempts = 0;
+  const MAX_ATTEMPTS = 50;
+
+  // Aim for +/- 10% of target
+  const maxLimit = targetCalories * 1.1;
+  const minTarget = targetCalories * 0.9;
+
+  while (currentCalories < minTarget && attempts < MAX_ATTEMPTS) {
+    attempts++;
+    
+    // Filter candidates that fit in the remaining calorie budget (mostly)
+    // and haven't been used too much
+    const candidates = availableFoods.filter(f => {
+      // Don't add if it blows the budget significantly
+      if (currentCalories + f.calories > maxLimit) return false;
+      
+      // Max 2 servings per item
+      const existing = itemsMap.get(f.id);
+      if (existing && existing.count >= 2) return false;
+      
+      return true;
+    });
+
+    if (candidates.length === 0) break;
+
+    const food = getRandomFood(candidates);
+    
+    const existing = itemsMap.get(food.id);
+    if (existing) {
+      existing.count++;
+      existing.totalCalories += food.calories;
+      // Since objects are passed by reference, 'items' array is already updated
+    } else {
+      const newServing: Serving = {
+        foodId: food.id,
+        foodName: food.name,
+        count: 1,
+        calories: food.calories,
+        totalCalories: food.calories
+      };
+      items.push(newServing);
+      itemsMap.set(food.id, newServing);
+    }
+    currentCalories += food.calories;
   }
 
-  return { value: roundedBMI, category, label, color };
-};
-
-export const getExerciseRecommendations = (bmiCategory: BMICategory): Exercise[] => {
-  return EXERCISE_DATABASE[bmiCategory] || EXERCISE_DATABASE['Normal'];
-};
-
-const servingSchema: Schema = {
-  type: Type.OBJECT,
-  properties: {
-    foodId: { type: Type.INTEGER },
-    foodName: { type: Type.STRING },
-    count: { type: Type.INTEGER, description: "Number of servings, max 2" },
-    calories: { type: Type.INTEGER, description: "Calories per single serving" },
-    totalCalories: { type: Type.INTEGER, description: "calories * count" }
-  },
-  required: ["foodId", "foodName", "count", "calories", "totalCalories"]
-};
-
-const mealSchema: Schema = {
-  type: Type.OBJECT,
-  properties: {
-    items: { type: Type.ARRAY, items: servingSchema },
-    totalCalories: { type: Type.INTEGER },
-    targetCalories: { type: Type.INTEGER, description: "The target goal for this meal" }
-  },
-  required: ["items", "totalCalories", "targetCalories"]
-};
-
-const planResponseSchema: Schema = {
-  type: Type.OBJECT,
-  properties: {
-    breakfast: mealSchema,
-    lunch: mealSchema,
-    dinner: mealSchema,
-    totalCalories: { type: Type.INTEGER },
-    totalPreferenceScore: { type: Type.INTEGER }
-  },
-  required: ["breakfast", "lunch", "dinner", "totalCalories"]
+  return {
+    items: items,
+    totalCalories: currentCalories,
+    targetCalories
+  };
 };
 
 export const generateMealPlan = async (
   profile: UserProfile,
   foods: FoodItem[]
 ): Promise<DailyPlan> => {
+  // Simulate a short delay to make it feel like "calculation" is happening
+  // and to prevent UI flicker
+  await new Promise(resolve => setTimeout(resolve, 800));
+
   const bmr = calculateBMR(profile);
-  const bmiResult = calculateBMI(profile.weight, profile.height);
-  const exercises = getExerciseRecommendations(bmiResult.category);
   
   const breakfastTarget = Math.round(bmr * 0.25);
   const lunchTarget = Math.round(bmr * 0.35);
   const dinnerTarget = Math.round(bmr * 0.40);
 
-  // Optimization: Use CSV format to drastically reduce payload size and token usage.
-  // This helps prevent "Rpc failed due to xhr error" (code 500) caused by massive JSON bodies.
-  const csvList = foods.map(f => `${f.id}|${f.name.replace(/\|/g, '')}|${f.calories}|${f.preference}`).join('\n');
+  // Filter out disliked foods (preference 0) unless that's all there is
+  const preferredFoods = foods.filter(f => f.preference > 0);
+  const pool = preferredFoods.length > 0 ? preferredFoods : foods;
 
-  const prompt = `
-    You are a Smart Diet Planner.
-    User Stats:
-    - Daily Calorie Target: ${bmr} kcal.
-    - Breakfast Target (~25%): ${breakfastTarget} kcal.
-    - Lunch Target (~35%): ${lunchTarget} kcal.
-    - Dinner Target (~40%): ${dinnerTarget} kcal.
-    
-    Constraints:
-    1. Select foods from the provided CSV list ONLY.
-    2. In a single meal, the same food item MUST NOT exceed 2 servings.
-    3. Maximize the Total Preference Score. Prefer foods with preference > 3. Avoid preference 0 or 1 if possible.
-    4. Stay close to the calorie targets for each meal (+/- 10% tolerance is acceptable, but try to be precise).
-    
-    Food Database (CSV Format: id|name|calories|preference):
-    ${csvList}
-    
-    Return the result in JSON format matching the schema.
-  `;
+  // Generate meals independently
+  const breakfast = createMeal(breakfastTarget, pool);
+  const lunch = createMeal(lunchTarget, pool);
+  const dinner = createMeal(dinnerTarget, pool);
 
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const totalCalories = breakfast.totalCalories + lunch.totalCalories + dinner.totalCalories;
+  
+  // Calculate total preference score
+  let totalPreferenceScore = 0;
+  const allItems = [...breakfast.items, ...lunch.items, ...dinner.items];
+  allItems.forEach(item => {
+    const food = foods.find(f => f.id === item.foodId);
+    if (food) {
+      totalPreferenceScore += (food.preference * item.count);
+    }
+  });
 
-  try {
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
-      contents: prompt,
-      config: {
-        responseMimeType: "application/json",
-        responseSchema: planResponseSchema,
-        temperature: 0.3,
-      }
-    });
-
-    const result = JSON.parse(response.text);
-    return {
-      ...result,
-      bmr,
-      bmi: bmiResult,
-      exercises
-    };
-
-  } catch (error) {
-    console.error("Error generating plan:", error);
-    throw error; 
-  }
+  return {
+    breakfast,
+    lunch,
+    dinner,
+    totalCalories,
+    totalPreferenceScore,
+    bmr
+  };
 };
