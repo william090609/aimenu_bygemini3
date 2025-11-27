@@ -4,7 +4,7 @@ import ProfileForm from './components/ProfileForm';
 import PreferenceSelector from './components/PreferenceSelector';
 import PlanDisplay from './components/PlanDisplay';
 import { UserProfile, Gender, Step, FoodItem, DailyPlan, Language } from './types';
-import { INITIAL_FOOD_DATABASE, TRANSLATIONS, isVeganFood } from './constants';
+import { INITIAL_FOOD_DATABASE, TRANSLATIONS } from './constants';
 import { generateMealPlan } from './services/geminiService';
 
 const App: React.FC = () => {
@@ -21,6 +21,7 @@ const App: React.FC = () => {
   
   // Clone initial DB so we can modify preferences locally
   const [foods, setFoods] = useState<FoodItem[]>(INITIAL_FOOD_DATABASE);
+  const [excludedCategories, setExcludedCategories] = useState<string[]>([]);
   const [plan, setPlan] = useState<DailyPlan | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -41,6 +42,11 @@ const App: React.FC = () => {
         })));
       }
       
+      const savedExclusions = localStorage.getItem('smartDiet_exclusions');
+      if (savedExclusions) {
+         setExcludedCategories(JSON.parse(savedExclusions));
+      }
+
       const savedLang = localStorage.getItem('smartDiet_language');
       if (savedLang === 'zh' || savedLang === 'en') {
         setLanguage(savedLang);
@@ -72,11 +78,23 @@ const App: React.FC = () => {
     ));
   }, []);
 
+  const handleToggleExclusion = useCallback((category: string) => {
+      setExcludedCategories(prev => {
+          const newExclusions = prev.includes(category) 
+            ? prev.filter(c => c !== category)
+            : [...prev, category];
+          return newExclusions;
+      });
+  }, []);
+
   const handleSave = useCallback(() => {
     try {
       // Save Profile
       localStorage.setItem('smartDiet_profile', JSON.stringify(profile));
       
+      // Save Exclusions
+      localStorage.setItem('smartDiet_exclusions', JSON.stringify(excludedCategories));
+
       // Save Preferences (Optimization: only save non-default values)
       const prefsMap = foods.reduce((acc, item) => {
         if (item.preference !== 3) {
@@ -90,15 +108,20 @@ const App: React.FC = () => {
       console.error("Failed to save data:", error);
       alert("Failed to save data. Storage might be full.");
     }
-  }, [profile, foods]);
+  }, [profile, foods, excludedCategories]);
 
-  // Filtered foods based on Vegan status
+  // Filtered foods based on Vegan status AND Exclusions
   const displayFoods = useMemo(() => {
+      let result = foods;
       if (profile.isVegan) {
-          return foods.filter(f => isVeganFood(f.name));
+          result = result.filter(f => f.isVegan);
       }
-      return foods;
-  }, [foods, profile.isVegan]);
+      // Filter out excluded categories
+      if (excludedCategories.length > 0) {
+          result = result.filter(f => !excludedCategories.includes(f.category));
+      }
+      return result;
+  }, [foods, profile.isVegan, excludedCategories]);
 
   const handleGenerate = async () => {
     // Auto-save before generating
@@ -143,6 +166,8 @@ const App: React.FC = () => {
             onGenerate={handleGenerate}
             isLoading={isLoading}
             language={language}
+            excludedCategories={excludedCategories}
+            onToggleExclusion={handleToggleExclusion}
           />
         );
       case 'plan':

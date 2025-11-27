@@ -19,6 +19,8 @@ export interface FoodItem {
   name: string;
   calories: number;
   preference: number; // 0-6, default 3
+  isVegan: boolean;
+  category: string;
 }
 
 export interface Serving {

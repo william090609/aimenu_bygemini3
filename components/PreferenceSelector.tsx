@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { FoodItem, Language } from '../types';
-import { TRANSLATIONS, getFoodCategory, CATEGORY_ORDER } from '../constants';
+import { TRANSLATIONS, CATEGORY_ORDER } from '../constants';
 
 interface PreferenceSelectorProps {
   foods: FoodItem[];
@@ -9,11 +9,23 @@ interface PreferenceSelectorProps {
   onGenerate: () => void;
   isLoading: boolean;
   language: Language;
+  excludedCategories: string[];
+  onToggleExclusion: (category: string) => void;
 }
 
-const PreferenceSelector: React.FC<PreferenceSelectorProps> = ({ foods, onUpdatePreference, onBulkUpdatePreference, onGenerate, isLoading, language }) => {
+const PreferenceSelector: React.FC<PreferenceSelectorProps> = ({ 
+    foods, 
+    onUpdatePreference, 
+    onBulkUpdatePreference, 
+    onGenerate, 
+    isLoading, 
+    language,
+    excludedCategories,
+    onToggleExclusion
+}) => {
   const [filter, setFilter] = useState('');
   const [collapsedCategories, setCollapsedCategories] = useState<Record<string, boolean>>({});
+  const [showExclusions, setShowExclusions] = useState(false);
   const t = TRANSLATIONS[language];
 
   // Group foods by category
@@ -29,7 +41,7 @@ const PreferenceSelector: React.FC<PreferenceSelectorProps> = ({ foods, onUpdate
     });
     
     filtered.forEach(food => {
-        const cat = getFoodCategory(food.name);
+        const cat = food.category;
         if (!groups[cat]) {
              // Fallback if category logic returns something not in ORDER list
              if (!groups['cat_other']) groups['cat_other'] = [];
@@ -75,6 +87,62 @@ const PreferenceSelector: React.FC<PreferenceSelectorProps> = ({ foods, onUpdate
             <h2 className="text-2xl font-bold text-white">{t.prefTitle}</h2>
             <p className="text-slate-400 text-sm">{t.prefSubtitle}</p>
         </div>
+
+        {/* Exclusion Filter Toggle */}
+        <div className="border border-slate-700 rounded-xl bg-slate-800/50 overflow-hidden">
+            <button 
+                onClick={() => setShowExclusions(!showExclusions)}
+                className="w-full flex items-center justify-between p-3 text-sm font-medium text-slate-200 hover:bg-slate-800 transition-colors"
+            >
+                <div className="flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-emerald-500"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+                    <span>{t.filterCategories}</span>
+                </div>
+                <div className="flex items-center gap-2 text-slate-400">
+                    <span className="text-xs">{excludedCategories.length > 0 ? `${excludedCategories.length} ${t.hidden}` : ''}</span>
+                    <svg 
+                        xmlns="http://www.w3.org/2000/svg" 
+                        width="16" 
+                        height="16" 
+                        viewBox="0 0 24 24" 
+                        fill="none" 
+                        stroke="currentColor" 
+                        strokeWidth="2" 
+                        strokeLinecap="round" 
+                        strokeLinejoin="round"
+                        className={`transition-transform duration-200 ${showExclusions ? 'rotate-180' : ''}`}
+                    >
+                        <polyline points="6 9 12 15 18 9"/>
+                    </svg>
+                </div>
+            </button>
+            
+            {showExclusions && (
+                <div className="p-3 border-t border-slate-700 bg-slate-900/50">
+                    <p className="text-xs text-slate-400 mb-3">{t.filterSubtitle}</p>
+                    <div className="flex flex-wrap gap-2">
+                        {CATEGORY_ORDER.map(catKey => {
+                            const isExcluded = excludedCategories.includes(catKey);
+                            const catName = (t as any)[catKey] || catKey;
+                            return (
+                                <button
+                                    key={catKey}
+                                    onClick={() => onToggleExclusion(catKey)}
+                                    className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all border ${
+                                        isExcluded 
+                                        ? 'bg-slate-800 text-slate-500 border-slate-700 opacity-60 line-through decoration-slate-500' 
+                                        : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/50 hover:bg-emerald-500/20'
+                                    }`}
+                                >
+                                    {catName}
+                                </button>
+                            );
+                        })}
+                    </div>
+                </div>
+            )}
+        </div>
+
         <div className="relative">
              <input 
                 type="text" 
@@ -192,6 +260,7 @@ const PreferenceSelector: React.FC<PreferenceSelectorProps> = ({ foods, onUpdate
             <div className="text-center py-10 text-slate-500 flex flex-col items-center gap-2">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="opacity-50"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
                 <span>{t.noFoodsFound} "{filter}".</span>
+                {excludedCategories.length > 0 && <span className="text-xs text-slate-600">Check your active category filters.</span>}
             </div>
         )}
       </div>
