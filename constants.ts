@@ -11,6 +11,7 @@ export const TRANSLATIONS = {
     male: "Male",
     female: "Female",
     activityLevel: "Activity Level",
+    isVegan: "I am Vegan (No meat, dairy, eggs)",
     nextBtn: "Next: Food Preferences",
     
     prefTitle: "Rate Your Foods",
@@ -40,6 +41,23 @@ export const TRANSLATIONS = {
     saveSuccess: "Saved",
     saveError: "Failed to save",
     watchVideo: "Watch Cooking Guide",
+
+    // Categories
+    cat_rice: "Rice Dishes",
+    cat_noodle: "Noodles & Pasta",
+    cat_bun: "Buns & Bread",
+    cat_soup: "Soups",
+    cat_veg: "Vegetables",
+    cat_tofu: "Tofu & Bean Products",
+    cat_seafood: "Seafood",
+    cat_chicken: "Chicken",
+    cat_poultry: "Duck & Goose",
+    cat_beef: "Beef",
+    cat_pork: "Pork",
+    cat_egg: "Egg Dishes",
+    cat_dessert: "Desserts & Snacks",
+    cat_other: "Other Dishes",
+    bulkSet: "Set all",
   },
   zh: {
     profileTitle: "讓我們了解您",
@@ -51,6 +69,7 @@ export const TRANSLATIONS = {
     male: "男性",
     female: "女性",
     activityLevel: "活動量",
+    isVegan: "我是純素食者 (無肉/蛋/奶)",
     nextBtn: "下一步：食物偏好",
     
     prefTitle: "食物評分",
@@ -80,6 +99,23 @@ export const TRANSLATIONS = {
     saveSuccess: "已儲存",
     saveError: "儲存失敗",
     watchVideo: "觀看烹飪教學",
+
+    // Categories
+    cat_rice: "飯類",
+    cat_noodle: "粉麵類",
+    cat_bun: "包點與麵包",
+    cat_soup: "湯類",
+    cat_veg: "蔬菜類",
+    cat_tofu: "豆腐與豆製品",
+    cat_seafood: "海鮮",
+    cat_chicken: "雞肉",
+    cat_poultry: "鴨鵝禽類",
+    cat_beef: "牛肉",
+    cat_pork: "豬肉",
+    cat_egg: "蛋類",
+    cat_dessert: "甜品與小食",
+    cat_other: "其他菜式",
+    bulkSet: "全部設為",
   }
 };
 
@@ -90,6 +126,110 @@ export const ACTIVITY_LEVELS = [
   { value: 1.725, label: { en: 'Very Active (6-7 days/week)', zh: '高度活動 (每週 6-7 天)' } },
   { value: 1.9, label: { en: 'Super Active (Physical job)', zh: '極度活動 (體力勞動)' } },
 ];
+
+export const CATEGORY_ORDER = [
+  'cat_rice',
+  'cat_noodle',
+  'cat_bun',
+  'cat_beef',
+  'cat_pork',
+  'cat_chicken',
+  'cat_poultry',
+  'cat_seafood',
+  'cat_veg',
+  'cat_tofu',
+  'cat_egg',
+  'cat_soup',
+  'cat_dessert',
+  'cat_other'
+];
+
+export const isVeganFood = (name: string): boolean => {
+  const n = name.toLowerCase();
+  
+  // 1. Explicitly Vegetarian/Vegan (Check for contradictions)
+  if (n.includes('vegetarian') || n.includes('素')) {
+      if (n.match(/egg|milk|butter|cheese|cream|honey|lard|oyster sauce/)) return false;
+      // Check Chinese for egg/milk/butter/oyster sauce
+      if (n.match(/蛋|奶|牛油|蠔油/)) return false; 
+      return true;
+  }
+
+  // 2. Explicit Non-Vegan Ingredients (English)
+  if (n.match(/beef|pork|chicken|duck|goose|pigeon|lamb|mutton|ham|bacon|sausage|char siu|luncheon|salami|rib|steak|brisket|trotter|kidney|liver|intestine|tripe|cow|ox|pig|hog|roast|bbq|barbecue|meat|bolognese|ragu|pepperoni/)) return false;
+  if (n.match(/fish|shrimp|crab|clam|oyster|scallop|squid|octopus|mussel|seafood|eel|abalone|grouper|salmon|tuna|cod|cuttlefish|prawn|maw|shark/)) return false;
+  if (n.match(/egg|milk|butter|cheese|cream|lard|yogurt|custard|mayonnaise|honey|whey|casein|ghee/)) return false;
+  
+  // 3. Explicit Non-Vegan Ingredients (Chinese)
+  // Check for specific Chinese characters denoting animals or non-vegan products
+  // 雞 (Chicken), 牛 (Cow), 豬 (Pig), 鴨 (Duck), 鵝 (Goose), 魚 (Fish), 蝦 (Shrimp), 蟹 (Crab), 蜆 (Clam), 蠔 (Oyster), 魷 (Squid), 章 (Octopus), 蛋 (Egg), 奶 (Milk)
+  if (n.match(/[雞牛豬鴨鵝魚蝦蟹蜆蠔魷章蛋奶]/)) return false;
+  
+  // '肉' (Meat) - Be careful of exceptions like '果肉' (Fruit pulp), '素肉' (Veggie meat), '肉桂' (Cinnamon)
+  if (n.includes('肉') && !n.match(/果肉|素肉|肉桂/)) return false;
+
+  // 4. Risky dishes that usually contain meat/egg/seafood sauce
+  if (n.match(/wonton|siu mai|har gow|potsticker|ravioli|bolognese|carbonara/)) return false;
+  if (n.includes('fried rice')) return false; // usually has egg
+  if (n.includes('chow mein') || n.includes('lo mein') || n.includes('oyster sauce') || n.includes('xo sauce') || n.includes('xo 醬')) return false;
+
+  // 5. Buns often contain lard/milk/egg
+  if (n.includes('bun') && !n.includes('mantou')) return false; // Assume non-vegan unless 'vegetarian' caught above
+  
+  // 6. Soups often have meat stock
+  if (n.includes('soup') || n.includes('broth') || n.includes('congee')) {
+      if (n.match(/sweet|bean|walnut|sesame|almond|pumpkin|corn/)) return true; // Dessert soups ok
+      if (n.includes('plain congee')) return true;
+      return false; // Savory soups usually have stock
+  }
+
+  return true;
+};
+
+export const getFoodCategory = (name: string): string => {
+  const n = name.toLowerCase();
+  
+  // 1. Desserts & Snacks (Priority to catch sweet soups/buns)
+  if (n.match(/sweet|sugar|cake|tart|pudding|jelly|ice|mochi|cookie|waffle|pancake|dessert|chocolate|tea|milk|drink|sago|custard|fruit|mango|papaya|almond|sesame|bean soup|glutinous ball|tofu pudding|snack|biscuit|puff|pie|donut|jello/)) return 'cat_dessert';
+
+  // 2. Tofu
+  if (n.match(/tofu|bean curd|soy/)) return 'cat_tofu';
+
+  // 3. Vegetables (Plant-based dishes)
+  if (n.match(/vegetable|bean|mushroom|corn|broccoli|cabbage|spinach|lettuce|eggplant|gourd|lotus|potato|taro|yam|tomato|salad|vegetarian|okra|pea|fungus|choy|kale|turnip|water chestnut|cucumber|pumpkin|seaweed|bamboo|asparagus|cauliflower|celery|yam|root|sprout/)) return 'cat_veg';
+
+  // 4. Rice (Rice dishes, Congee, Fried Rice)
+  if (n.match(/rice|congee|don|bibimbap|risotto/)) return 'cat_rice';
+
+  // 5. Noodles (Noodles, Pasta, Vermicelli)
+  if (n.match(/noodle|vermicelli|spaghetti|macaroni|udon|ramen|pho|penne|linguine|chow mein|lo mein|ho fun|pasta|lasagna/)) return 'cat_noodle';
+
+  // 6. Buns (Buns, Bread, Dumplings, Pizza)
+  if (n.match(/bun|toast|sandwich|bread|pizza|burger|dumpling|wonton|siu mai|har gow|potsticker|ravioli|wrap|crepe|doughnut|stick|baguette|croissant|pie|puff/)) return 'cat_bun';
+  
+  // 7. Soups (Stand-alone savory soups)
+  if (n.match(/soup|broth|geng|potage|bisque/)) return 'cat_soup';
+  
+  // 8. Seafood
+  if (n.match(/fish|shrimp|crab|clam|oyster|scallop|squid|lobster|mussel|prawn|seafood|eel|abalone|grouper|salmon|tuna|cod|octopus|cuttlefish/)) return 'cat_seafood';
+  
+  // 9. Poultry (Duck, Goose, Pigeon)
+  if (n.match(/duck|goose|pigeon|quail|turkey/)) return 'cat_poultry';
+
+  // 10. Chicken
+  if (n.match(/chicken|poultry|wing|feet/)) return 'cat_chicken';
+  
+  // 11. Beef
+  if (n.match(/beef|steak|ox|cow|veal|ribeye|sirloin|brisket|tripe/)) return 'cat_beef';
+  
+  // 12. Pork
+  if (n.match(/pork|char siu|ham|bacon|sausage|rib|luncheon|pig|trotter|chop|salami|pepperoni|meatball|intestine|kidney|liver/)) return 'cat_pork';
+  
+  // 13. Egg
+  if (n.match(/egg|omelette/)) return 'cat_egg';
+  
+  return 'cat_other';
+};
 
 // Complete Food Database from the provided PDF
 export const INITIAL_FOOD_DATABASE: FoodItem[] = [

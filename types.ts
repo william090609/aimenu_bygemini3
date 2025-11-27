@@ -11,6 +11,7 @@ export interface UserProfile {
   age: number; // years
   gender: Gender;
   activityLevel: number; // 1.2 to 1.9
+  isVegan: boolean; // New vegan flag
 }
 
 export interface FoodItem {

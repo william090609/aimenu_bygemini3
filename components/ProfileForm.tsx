@@ -4,7 +4,7 @@ import { ACTIVITY_LEVELS, TRANSLATIONS } from '../constants';
 
 interface ProfileFormProps {
   profile: UserProfile;
-  onChange: (field: keyof UserProfile, value: string | number) => void;
+  onChange: (field: keyof UserProfile, value: any) => void;
   onNext: () => void;
   language: Language;
 }
@@ -95,6 +95,20 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ profile, onChange, onNext, la
             </button>
           ))}
         </div>
+      </div>
+
+      {/* Vegan Switch */}
+      <div className="bg-slate-800 border border-slate-700 rounded-xl p-4 flex items-center justify-between">
+          <div className="flex flex-col">
+              <span className="font-semibold text-white">{t.isVegan}</span>
+              <span className="text-xs text-slate-400">Excludes all meat, fish, eggs, dairy</span>
+          </div>
+          <button 
+            onClick={() => onChange('isVegan', !profile.isVegan)}
+            className={`w-12 h-7 rounded-full transition-colors relative ${profile.isVegan ? 'bg-emerald-500' : 'bg-slate-600'}`}
+          >
+              <div className={`w-5 h-5 bg-white rounded-full absolute top-1 transition-transform ${profile.isVegan ? 'left-6' : 'left-1'}`} />
+          </button>
       </div>
 
       <div className="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-slate-900 via-slate-900 to-transparent flex justify-center max-w-md mx-auto">

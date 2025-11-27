@@ -1,10 +1,10 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import Layout from './components/Layout';
 import ProfileForm from './components/ProfileForm';
 import PreferenceSelector from './components/PreferenceSelector';
 import PlanDisplay from './components/PlanDisplay';
 import { UserProfile, Gender, Step, FoodItem, DailyPlan, Language } from './types';
-import { INITIAL_FOOD_DATABASE, TRANSLATIONS } from './constants';
+import { INITIAL_FOOD_DATABASE, TRANSLATIONS, isVeganFood } from './constants';
 import { generateMealPlan } from './services/geminiService';
 
 const App: React.FC = () => {
@@ -16,6 +16,7 @@ const App: React.FC = () => {
     age: 0,
     gender: Gender.MALE,
     activityLevel: 1.2,
+    isVegan: false,
   });
   
   // Clone initial DB so we can modify preferences locally
@@ -55,13 +56,19 @@ const App: React.FC = () => {
     localStorage.setItem('smartDiet_language', newLang);
   }, [language]);
 
-  const handleProfileChange = useCallback((field: keyof UserProfile, value: string | number) => {
+  const handleProfileChange = useCallback((field: keyof UserProfile, value: any) => {
     setProfile(prev => ({ ...prev, [field]: value }));
   }, []);
 
   const handlePreferenceUpdate = useCallback((id: number, rating: number) => {
     setFoods(prev => prev.map(item => 
       item.id === id ? { ...item, preference: rating } : item
+    ));
+  }, []);
+
+  const handleBulkPreferenceUpdate = useCallback((ids: number[], rating: number) => {
+    setFoods(prev => prev.map(item => 
+      ids.includes(item.id) ? { ...item, preference: rating } : item
     ));
   }, []);
 
@@ -85,13 +92,22 @@ const App: React.FC = () => {
     }
   }, [profile, foods]);
 
+  // Filtered foods based on Vegan status
+  const displayFoods = useMemo(() => {
+      if (profile.isVegan) {
+          return foods.filter(f => isVeganFood(f.name));
+      }
+      return foods;
+  }, [foods, profile.isVegan]);
+
   const handleGenerate = async () => {
     // Auto-save before generating
     handleSave();
     
     setIsLoading(true);
     try {
-      const generatedPlan = await generateMealPlan(profile, foods);
+      // Pass the filtered list to the generator
+      const generatedPlan = await generateMealPlan(profile, displayFoods);
       setPlan(generatedPlan);
       setStep('plan');
     } catch (error) {
@@ -121,8 +137,9 @@ const App: React.FC = () => {
       case 'preferences':
         return (
           <PreferenceSelector 
-            foods={foods} 
+            foods={displayFoods} // Pass filtered foods
             onUpdatePreference={handlePreferenceUpdate} 
+            onBulkUpdatePreference={handleBulkPreferenceUpdate}
             onGenerate={handleGenerate}
             isLoading={isLoading}
             language={language}
