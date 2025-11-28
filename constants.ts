@@ -549,7 +549,7 @@ export const INITIAL_FOOD_DATABASE: FoodItem[] = [
   { id: 385, name: "Wonton dumplings (雲吞)", calories: 150, preference: 3, isVegan: false, category: 'cat_bun' },
   { id: 386, name: "Rice cracker snack (米通)", calories: 100, preference: 3, isVegan: true, category: 'cat_rice' },
   { id: 387, name: "Pineapple bun with ham & butter (火腿菠蘿包)", calories: 350, preference: 3, isVegan: false, category: 'cat_bun' },
-  { id: 388, name: "Hong Kong milk tea (no sugar) (凍奶茶 (無糖))", calories: 0, preference: 3, isVegan: false, category: 'cat_dessert' },
+  { id: 388, name: "Ginger puree (姜蓉)", calories: 90, preference: 3, isVegan: true, category: 'cat_other'},
   { id: 389, name: "Iced lemon tea (凍檸檬茶)", calories: 140, preference: 3, isVegan: true, category: 'cat_drink' },
   { id: 390, name: "Seasonal mixed fruit (時令水果)", calories: 100, preference: 3, isVegan: true, category: 'cat_dessert' },
   { id: 391, name: "Fruit ice jelly (水果冰)", calories: 150, preference: 3, isVegan: true, category: 'cat_dessert' },
@@ -752,7 +752,7 @@ export const INITIAL_FOOD_DATABASE: FoodItem[] = [
   { id: 588, name: "Dry-roasted plain peanut (乾焗原味花生)", calories: 170, preference: 3, isVegan: true, category: 'cat_dessert'},
   { id: 589, name: "Hard candies (硬糖)", calories: 30, preference: 3, isVegan: true, category: 'cat_dessert'},
   { id: 590, name: "Ice cream (雪糕)", calories: 130, preference: 3, isVegan: true, category: 'cat_dessert'},
-  { id: 591, name: "Milk chococlate (牛奶朱古力)", calories: 40, preference: 3, isVegan: true, category: 'cat_dessert'},
+  { id: 591, name: "Milk chococlate (cube) (牛奶朱古力 (方塊))", calories: 40, preference: 3, isVegan: true, category: 'cat_dessert'},
   { id: 600, name: "Nougat (鳥結糖)", calories: 60, preference: 3, isVegan: true, category: 'cat_dessert'},
   { id: 601, name: "Popcon (爆谷)", calories: 420, preference: 3, isVegan: true, category: 'cat_dessert'},
   { id: 602, name: "Coconut milk yellow bean pudding (椰汁馬豆糕)", calories: 120, preference: 3, isVegan: true, category: 'cat_dessert'},
@@ -782,6 +782,5 @@ export const INITIAL_FOOD_DATABASE: FoodItem[] = [
   { id: 626, name: "Canola oil (芥花籽油)", calories: 130, preference: 3, isVegan: true, category: 'cat_other'},
   { id: 623, name: "Oilve oil (橄欖油)", calories: 130, preference: 3, isVegan: true, category: 'cat_other'},
   { id: 624, name: "Peanut oil (花生油)", calories: 130, preference: 3, isVegan: true, category: 'cat_other'},
-  { id: 625, name: "Sesame seed dressing (芝麻沙律醬)", calories: 70, preference: 3, isVegan: true, category: 'cat_other'},
-  { id: 626, name: "Ginger puree (姜蓉)", calories: 90, preference: 3, isVegan: true, category: 'cat_other'}
+  { id: 625, name: "Sesame seed dressing (芝麻沙律醬)", calories: 70, preference: 3, isVegan: true, category: 'cat_other'}
 ];
