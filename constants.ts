@@ -751,5 +751,5 @@ export const INITIAL_FOOD_DATABASE: FoodItem[] = [
   { id: 590, name: "Ice cream (雪糕)", calories: 130, preference: 3, isVegan: true, category: 'cat_dessert'},
   { id: 591, name: "Milk chococlate (牛奶朱古力)", calories: 40, preference: 3, isVegan: true, category: 'cat_dessert'},
   { id: 600, name: "Nougat (鳥結糖)", calories: 60, preference: 3, isVegan: true, category: 'cat_dessert'},
-  { id: 6001, name: "Popcon (爆谷)", calories: 420, preference: 3, isVegan: true, category: 'cat_dessert'}
+  { id: 601, name: "Popcon (爆谷)", calories: 420, preference: 3, isVegan: true, category: 'cat_dessert'}
 ];
